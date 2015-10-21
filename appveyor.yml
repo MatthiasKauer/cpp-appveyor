@@ -16,7 +16,7 @@ before_build:
     - cd build
     - cmake -G "Visual Studio 14 2015 Win64" ..
     - dir
-    - msbuild /m /p:Configuration=Release /p:Platform="Win32" odeint_appveyor.sln
+    - msbuild /m /p:Configuration=Release odeint_appveyor.sln
 
 build:
   project: INSTALL.vcxproj      # path to Visual Studio solution or project

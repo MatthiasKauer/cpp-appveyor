@@ -18,8 +18,11 @@ ExternalProject_Add(
     LOG_DOWNLOAD ON
     LOG_INSTALL ON
     )
+ExternalProject_Get_Property(catch source_dir)
+set(CatchIncludeDir ${source_dir}/single_include)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-
+ADD_EXECUTABLE(catch.exe main_catch.cpp)
+target_include_directories(catch.exe PRIVATE ${CatchIncludeDir})
 

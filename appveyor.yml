@@ -1,0 +1,19 @@
+
+# https://github.com/alex85k/sqlite3-cmake/blob/master/appveyor.yml
+
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+
+platform: x64
+configuration: Release
+
+# scripts to run before build
+before_build:
+  - echo Running cmake...
+  - cd c:\projects\sqlite
+  - cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_INSTALL_PREFIX=%P%
+
+build:
+  project: INSTALL.vcxproj      # path to Visual Studio solution or project
+

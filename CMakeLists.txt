@@ -27,5 +27,5 @@ if(WIN32)
     set(BOOST_ROOT "C:/Libraries/boost_1_59_0")
 endif()
 
-
+add_dependencies(catch.exe catch)
 target_include_directories(catch.exe PRIVATE ${CatchIncludeDir})

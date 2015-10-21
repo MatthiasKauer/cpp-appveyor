@@ -24,7 +24,7 @@ ExternalProject_Get_Property(catch source_dir)
 set(CatchIncludeDir ${source_dir}/single_include)
 
 if(WIN32)
-    set(BOOST_ROOT "C:\Libraries\boost_1_59_0")
+    set(BOOST_ROOT "C:/Libraries/boost_1_59_0")
 endif()
 
 

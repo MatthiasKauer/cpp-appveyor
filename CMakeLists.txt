@@ -23,17 +23,9 @@ ExternalProject_Add(
 ExternalProject_Get_Property(catch source_dir)
 set(CatchIncludeDir ${source_dir}/single_include)
 
-ExternalProject_Add(
-    odeint
-    PREFIX ${CMAKE_BINARY_DIR}/odeint
-    GIT_REPOSITORY https://github.com/headmyshoulder/odeint-v2.git
-    GIT_TAG v2.5_boost1.59
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-    LOG_INSTALL ON
-    )
-ExternalProject_Get_Property(odeint source_dir)
-set(OdeintIncludeDir ${source_dir}/include)
-target_include_directories(catch.exe PRIVATE ${CatchIncludeDir} ${OdeintIncludeDir})
+if(WIN32)
+    set(BOOST_ROOT "C:\Libraries\boost_1_59_0")
+endif()
+
+
+target_include_directories(catch.exe PRIVATE ${CatchIncludeDir})

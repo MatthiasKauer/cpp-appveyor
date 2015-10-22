@@ -24,7 +24,10 @@ ExternalProject_Get_Property(catch source_dir)
 set(CatchIncludeDir ${source_dir}/single_include)
 
 if(WIN32)
+    set(Boost_USE_STATIC_LIBS ON) # only find static libs (this was crucial before that nothing worked on Windows, screws things up for Debian though)
     set(BOOST_ROOT "C:/Libraries/boost_1_59_0")
+    message(WIN32 BOOST_LIBRARYDIR  " " ${BOOST_LIBRARYDIR})
+    message(WIN32 BOOST_ROOT " " ${BOOST_ROOT})
 endif()
 
 add_dependencies(catch.exe catch)

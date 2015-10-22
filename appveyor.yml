@@ -2,22 +2,20 @@
 # https://github.com/alex85k/sqlite3-cmake/blob/master/appveyor.yml
 # https://github.com/robotology-playground/lib-template-cmake/blob/master/appveyor.yml
 
-# Operating system (build VM template)
-os: Visual Studio 2015
-
-
-platform: x64
-configuration: Release
-
 # scripts to run before build
 build_script:
     - echo Running cmake...
     - mkdir build
     - cd build
-    - cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release ..
+    - cmake -G "Visual Studio 12" -DCMAKE_BUILD_TYPE=Release ..
     - dir
       #- msbuild /m /p:Configuration=Release odeint_appveyor.sln
     - cmake --build . --config Release
 
 artifacts:
     - path: build\Release\*
+
+test_script:
+    - echo I'm now starting catch tests (https://github.com/philsquared/Catch)
+    - build\Release\test_runner.exe
+

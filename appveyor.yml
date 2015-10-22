@@ -10,14 +10,12 @@ platform: x64
 configuration: Release
 
 # scripts to run before build
-before_build:
+build_script:
     - echo Running cmake...
     - mkdir build
     - cd build
     - cmake -G "Visual Studio 14 2015 Win64" ..
     - dir
-    - msbuild /m /p:Configuration=Release odeint_appveyor.sln
-
-build:
-  project: INSTALL.vcxproj      # path to Visual Studio solution or project
+      #- msbuild /m /p:Configuration=Release odeint_appveyor.sln
+    - cmake --build .
 

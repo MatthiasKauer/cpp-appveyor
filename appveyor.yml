@@ -18,5 +18,6 @@ artifacts:
 test_script:
     - echo I'm now starting catch tests (https://github.com/philsquared/Catch)
     - dir
-    - build\Release\test_runner.exe
+      # looks like I'm in build dir already
+    - Release\test_runner.exe
 

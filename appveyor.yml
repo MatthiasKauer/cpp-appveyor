@@ -14,8 +14,10 @@ build_script:
     - echo Running cmake...
     - mkdir build
     - cd build
-    - cmake -G "Visual Studio 14 2015 Win64" ..
+    - cmake -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Release ..
     - dir
       #- msbuild /m /p:Configuration=Release odeint_appveyor.sln
-    - cmake --build .
+    - cmake --build . --config Release
 
+artifacts:
+    - path: build\Release\*

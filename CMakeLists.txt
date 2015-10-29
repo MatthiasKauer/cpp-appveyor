@@ -5,9 +5,10 @@ project (odeint_appveyor)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 #enable_testing()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g")
 ADD_EXECUTABLE(test_runner main_catch.cpp)
 
+set(Boost_DEBUG ON)
 # for header-only git http://stackoverflow.com/a/21223763
 ExternalProject_Add(
     catch
@@ -38,7 +39,7 @@ if(WIN32)   #true for all Windows (not Cygwin!) https://cmake.org/Wiki/CMake_Use
     message(WIN32 BOOST_ROOT " " ${BOOST_ROOT})
 endif()
 
-find_package(BOOST 1.55)
+find_package(Boost 1.55)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 

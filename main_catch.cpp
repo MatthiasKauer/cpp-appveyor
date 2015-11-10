@@ -4,6 +4,7 @@
 #include <catch.hpp>
 #include <boost/numeric/odeint.hpp>
 #include <boost/range.hpp>
+//#include <boost/range/iterator.hpp>
 
 // #include "build/installed/catch.hpp"
 
@@ -46,16 +47,34 @@ TEST_CASE("Odeint works", "[odeint]") {
   REQUIRE(x1[0] != x[0]);
 }
 
-template< class Range >
-int my_range_sum(Range& c) {
+template <class Range> int my_range_sum(const Range &c) {
   int sum = 0;
-    for (auto it=boost::begin(c); it!=boost::end(c); ++it) {
-      sum += *it;
-    }
-    return sum;
+  for (auto it = boost::begin(c); it != boost::end(c); ++it) {
+    sum += *it;
+  }
+  return sum;
 }
 
-TEST_CASE("boost range experiments") { vector<int> v{{2, 3, 4, 5}};
+template <class Range> Range& my_one_maker(Range &c) {
+  //Range currying
+   for (auto it = boost::begin(c); it != boost::end(c); ++it) {
+    *it = 1;
+  }
+   return c;
+}
+TEST_CASE("boost range experiments") {
+  vector<int> v{{2, 3, 4, 5}};
+  // https://tlzprgmr.wordpress.com/2008/06/04/c-using-boost-ranges-to-simplify-enumerations/
   auto sum = my_range_sum(v);
   CHECK(14 == sum);
+
+  sum = my_range_sum(boost::make_iterator_range(v));
+  CHECK(14 == sum);
+
+  auto my_range = boost::make_iterator_range(v.begin() + 1, v.end());
+  sum = my_range_sum(my_range);
+  CHECK(12 == sum);
+
+  sum = my_range_sum(my_one_maker(my_range));
+  CHECK(3 == sum);
 }

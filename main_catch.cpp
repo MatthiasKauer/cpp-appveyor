@@ -4,6 +4,7 @@
 #include <catch.hpp>
 #include <boost/numeric/odeint.hpp>
 #include <boost/range.hpp>
+#include <boost/range/adaptor/sliced.hpp>
 //#include <boost/range/iterator.hpp>
 
 // #include "build/installed/catch.hpp"
@@ -47,7 +48,8 @@ TEST_CASE("Odeint works", "[odeint]") {
   REQUIRE(x1[0] != x[0]);
 }
 
-template <class Range> int my_range_sum(const Range &c) {
+typedef boost::iterator_range<std::vector<int>::iterator> vi_range;
+int my_range_sum(const vi_range &c) {
   int sum = 0;
   for (auto it = boost::begin(c); it != boost::end(c); ++it) {
     sum += *it;
@@ -55,7 +57,12 @@ template <class Range> int my_range_sum(const Range &c) {
   return sum;
 }
 
-template <class Range> Range &my_one_maker(Range &c) {
+int my_range_sum(const boost::iterator_range<int *> &c) {
+  std::vector<int> v(c.begin(), c.end());
+  return my_range_sum(v);
+}
+
+vi_range &my_one_maker(vi_range &c) {
   // Range currying
   for (auto it = boost::begin(c); it != boost::end(c); ++it) {
     *it = 1;
@@ -63,7 +70,7 @@ template <class Range> Range &my_one_maker(Range &c) {
   return c;
 }
 
-template <class Range> Range &actually_const_but_not_labeled(Range &c) {
+vi_range actually_const_but_not_labeled(vi_range &c) {
   // currying
   // c++;
   return c;
@@ -72,38 +79,76 @@ template <class Range> Range &actually_const_but_not_labeled(Range &c) {
 TEST_CASE("boost range experiments") {
   vector<int> v{{2, 3, 4, 5}};
   // https://tlzprgmr.wordpress.com/2008/06/04/c-using-boost-ranges-to-simplify-enumerations/
-  auto sum = my_range_sum(v);
-  CHECK(14 == sum);
-
-  // boost::sub_range<const int> const_range = boost::make_iterator_range(v);
-  auto v2 = v;
-  const auto new_range = boost::make_iterator_range_n(v2.data(), 4);
-
   // decent range example and constness explanation in bug report
   // https://svn.boost.org/trac/boost/ticket/10514
-  const boost::sub_range<std::vector<int>> const_sub(boost::begin(v2), boost::end(v2));
+  // slicing also really cool:
+  // http://www.boost.org/doc/libs/1_51_0/libs/range/doc/html/range/reference/adaptors/reference/sliced.html
+  // more explanations:
+  // http://theboostcpplibraries.com/boost.range-helper-classes-and-functions
 
-  sum = my_range_sum(new_range);
-  CHECK(14 == sum);
-  const int ci = 3;
-  auto &i = actually_const_but_not_labeled(ci);
-  i++;
-  CHECK(4 == i);
-  CHECK(3 == ci);
-  // actually_const_but_not_labeled(const_sub);
-  // my_one_maker(const_sub); //should not compile and doesn't but only if touching internals
+  SECTION("vector is cast to range") {
+    auto sum = my_range_sum(v);
+    CHECK(14 == sum);
+  }
 
+  SECTION("const range can still be added but not modified") {
+    // boost::sub_range<const int> const_range = boost::make_iterator_range(v);
+    const vi_range new_range = boost::make_iterator_range(v);
+    auto sum = my_range_sum(new_range);
+    CHECK(14 == sum);
 
-  sum = my_range_sum(boost::make_iterator_range(v));
-  CHECK(14 == sum);
+    // actually_const_but_not_labeled(new_range);    //correctly prevents access
+  }
 
-  auto my_range = boost::make_iterator_range(v.begin() + 1, v.end());
-  sum = my_range_sum(my_range);
-  CHECK(12 == sum);
+  SECTION("sub_range creation is somewhat more convenient but works with same "
+          "funcs") {
+    const boost::sub_range<std::vector<int>> const_sub(boost::begin(v),
+                                                       boost::end(v));
+    auto sum = my_range_sum(const_sub);
+    CHECK(14 == sum);
 
-  sum = my_range_sum(my_one_maker(my_range));
-  CHECK(3 == sum);
+    // actually_const_but_not_labeled(const_sub);    //correctly prevents access
+  }
 
+  SECTION("non-const ranges allow modification") {
+    auto range = boost::make_iterator_range(v);
+    int sum = my_range_sum(my_one_maker(range));
+    CHECK(4 == sum);
+  }
+
+  SECTION("slicing does not change type") {
+    int sum = my_range_sum(v | boost::adaptors::sliced(1,3));
+    CHECK(7 == sum);
+  }
+
+  SECTION("range can also be sliced") {
+    auto range = boost::make_iterator_range(v);
+    int sum = my_range_sum(range | boost::adaptors::sliced(1,3));
+    CHECK(7 == sum);
+  }
+
+  SECTION("const range works on temporary ranges") {
+    int sum = my_range_sum(boost::make_iterator_range(v));
+    CHECK(14 == sum);
+  }
+
+  SECTION("Range provides random access and slicing") {
+    auto my_range = boost::make_iterator_range(v.begin() + 1, v.end());
+    CHECK(4 == my_range[1]);
+  }
+
+  SECTION("I can create range from pointers") {
+    auto range = boost::make_iterator_range_n(v.data(), v.size());
+    CHECK(4 == range[2]);
+    auto sum = my_range_sum(range); //this is not a vector iterator range anymore; needs adapter
+    CHECK(14 == sum);
+  }
+
+  SECTION("Pointer range is still randomly accessible") {
+    auto range = boost::make_iterator_range_n(v.data(), v.size());
+    range[2] = 15;
+    CHECK(range[2] == 15);
+  }
 }
 
 TEST_CASE("can oclint detect out of bound access") {

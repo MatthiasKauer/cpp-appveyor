@@ -29,3 +29,22 @@ matthias@rp3deb:/tmp$ du -h -d 2 foo/
 4.5M	foo/boost
 4.5M	foo/
 ```
+
+### clang-check
+Couldn't figure out how to make this work for now :/
+
+### oclint
+Downloaded 0.8.1 from http://oclint.org/downloads.html.
+Generate compile_commands.json
+http://docs.oclint.org/en/dev/guide/cmake.html
+```
+~/oclint-0.8.1/bin/oclint -p . main_catch.cpp
+```
+gives output that my variable names suck...
+
+http://oclint.org/news/2013/06/22/clang-static-analyzer-integration/
+```
+~/oclint-0.8.1/bin/oclint -p . main_catch.cpp --enable-clang-static-analyzer
+```
+yields same result.
+

@@ -29,7 +29,7 @@ const double b = 8.0 / 3.0;
 
 typedef std::array<double, 3> state_type;
 
-void lorenz(const state_type &x, state_type &dxdt, double t) {
+void lorenz(const state_type &x, state_type &dxdt, double /*t */) {
   dxdt[0] = sigma * (x[1] - x[0]);
   dxdt[1] = R * x[0] - x[1] - x[0] * x[2];
   dxdt[2] = -b * x[2] + x[0] * x[1];
@@ -55,13 +55,14 @@ template <class Range> int my_range_sum(const Range &c) {
   return sum;
 }
 
-template <class Range> Range& my_one_maker(Range &c) {
-  //Range currying
-   for (auto it = boost::begin(c); it != boost::end(c); ++it) {
+template <class Range> Range &my_one_maker(Range &c) {
+  // Range currying
+  for (auto it = boost::begin(c); it != boost::end(c); ++it) {
     *it = 1;
   }
-   return c;
+  return c;
 }
+
 TEST_CASE("boost range experiments") {
   vector<int> v{{2, 3, 4, 5}};
   // https://tlzprgmr.wordpress.com/2008/06/04/c-using-boost-ranges-to-simplify-enumerations/

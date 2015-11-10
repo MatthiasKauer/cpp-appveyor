@@ -3,6 +3,7 @@ build/
 catch/
 # ninja is only cmake sub here!
 *.ninja
+compile_commands.json
 
 #### joe made this: http://goel.io/joe
 

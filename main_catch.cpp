@@ -63,11 +63,36 @@ template <class Range> Range &my_one_maker(Range &c) {
   return c;
 }
 
+template <class Range> Range &actually_const_but_not_labeled(Range &c) {
+  // currying
+  // c++;
+  return c;
+}
+
 TEST_CASE("boost range experiments") {
   vector<int> v{{2, 3, 4, 5}};
   // https://tlzprgmr.wordpress.com/2008/06/04/c-using-boost-ranges-to-simplify-enumerations/
   auto sum = my_range_sum(v);
   CHECK(14 == sum);
+
+  // boost::sub_range<const int> const_range = boost::make_iterator_range(v);
+  auto v2 = v;
+  const auto new_range = boost::make_iterator_range_n(v2.data(), 4);
+
+  // decent range example and constness explanation in bug report
+  // https://svn.boost.org/trac/boost/ticket/10514
+  const boost::sub_range<std::vector<int>> const_sub(boost::begin(v2), boost::end(v2));
+
+  sum = my_range_sum(new_range);
+  CHECK(14 == sum);
+  const int ci = 3;
+  auto &i = actually_const_but_not_labeled(ci);
+  i++;
+  CHECK(4 == i);
+  CHECK(3 == ci);
+  // actually_const_but_not_labeled(const_sub);
+  // my_one_maker(const_sub); //should not compile and doesn't but only if touching internals
+
 
   sum = my_range_sum(boost::make_iterator_range(v));
   CHECK(14 == sum);
@@ -78,4 +103,15 @@ TEST_CASE("boost range experiments") {
 
   sum = my_range_sum(my_one_maker(my_range));
   CHECK(3 == sum);
+
+}
+
+TEST_CASE("can oclint detect out of bound access") {
+  // trying static analysis
+  vector<int> v(3, 0);
+
+  int sum = 0;
+  sum += v[4];
+
+  CHECK(0 != sum);
 }
